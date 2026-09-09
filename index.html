@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ledger of Ten</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper: #eef0e4;
+    --paper-raised: #f7f8f0;
+    --ink: #1c2318;
+    --ink-soft: #4a4f3f;
+    --rule: #c7cbb4;
+    --rule-strong: #a9ae90;
+    --pine: #2f6b4f;
+    --pine-deep: #204a37;
+    --amber: #a8672a;
+    --rust: #97402c;
+    --shadow: rgba(28, 35, 24, 0.10);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper: #13170f;
+      --paper-raised: #191e13;
+      --ink: #e9ead9;
+      --ink-soft: #b3b7a0;
+      --rule: #333a26;
+      --rule-strong: #454d30;
+      --pine: #6cbb8d;
+      --pine-deep: #8fd4ac;
+      --amber: #d59a5c;
+      --rust: #d1836c;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper: #13170f;
+    --paper-raised: #191e13;
+    --ink: #e9ead9;
+    --ink-soft: #b3b7a0;
+    --rule: #333a26;
+    --rule-strong: #454d30;
+    --pine: #6cbb8d;
+    --pine-deep: #8fd4ac;
+    --amber: #d59a5c;
+    --rust: #d1836c;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:2.75rem 1.5rem 6rem;
+  }
+  h1,h2,h3{
+    font-family:"Fraunces", Georgia, serif;
+    text-wrap:balance;
+    margin:0;
+  }
+  header.masthead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:1rem;
+    border-bottom:3px double var(--rule-strong);
+    padding-bottom:0.9rem;
+    margin-bottom:0.5rem;
+  }
+  .masthead-title{
+    font-size:1.9rem;
+    font-weight:700;
+    font-variation-settings:"opsz" 40;
+    letter-spacing:-0.01em;
+  }
+  .masthead-date{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .dek{
+    color:var(--ink-soft);
+    font-size:1rem;
+    max-width:52ch;
+    margin:0.9rem 0 0;
+  }
+  .dek strong{color:var(--ink); font-weight:600;}
+
+  .sources{
+    margin:1.4rem 0 2.4rem;
+    padding:0.85rem 1rem;
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:3px;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+  }
+  .sources b{color:var(--ink); font-weight:600;}
+
+  .company-field{
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+    margin:1.6rem 0 2.2rem;
+    padding-bottom:0.9rem;
+    border-bottom:1px solid var(--rule);
+  }
+  .company-field label{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .company-field input{
+    flex:1;
+    font-family:"Fraunces", Georgia, serif;
+    font-size:1.25rem;
+    font-weight:600;
+    background:transparent;
+    border:none;
+    border-bottom:2px solid var(--rule-strong);
+    color:var(--ink);
+    padding:0.2rem 0.1rem;
+    min-width:0;
+  }
+  .company-field input:focus{
+    outline:none;
+    border-bottom-color:var(--pine);
+  }
+  .company-field input::placeholder{color:var(--rule-strong); font-weight:400;}
+
+  ol.ledger{
+    list-style:none;
+    margin:0;
+    padding:0;
+    counter-reset:step;
+  }
+  .entry{
+    counter-increment:step;
+    display:grid;
+    grid-template-columns:2.6rem 1fr;
+    gap:0 1rem;
+    padding:1.35rem 0;
+    border-bottom:1px solid var(--rule);
+  }
+  .entry:first-child{padding-top:0;}
+  .entry-num{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.95rem;
+    color:var(--ink-soft);
+  }
+  .entry-num::before{
+    content: counter(step, decimal-leading-zero);
+  }
+  .entry-body h3{
+    font-size:1.12rem;
+    font-weight:600;
+    font-variation-settings:"opsz" 24;
+    margin-bottom:0.3rem;
+  }
+  .entry-body p{
+    margin:0 0 0.55rem;
+    color:var(--ink-soft);
+    font-size:0.95rem;
+    max-width:56ch;
+  }
+  .cite{
+    font-size:0.78rem;
+    font-style:italic;
+    color:var(--ink-soft);
+    margin-bottom:0.7rem;
+  }
+  .cite b{
+    font-style:normal;
+    font-weight:600;
+    color:var(--pine-deep);
+  }
+  .toggle{
+    display:inline-flex;
+    border:1px solid var(--rule-strong);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .toggle button{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.74rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    background:var(--paper-raised);
+    color:var(--ink-soft);
+    border:none;
+    padding:0.4rem 0.75rem;
+    cursor:pointer;
+    border-right:1px solid var(--rule-strong);
+  }
+  .toggle button:last-child{border-right:none;}
+  .toggle button:hover{color:var(--ink);}
+  .toggle button[aria-pressed="true"]{
+    color:var(--paper);
+  }
+  .toggle button.yes[aria-pressed="true"]{background:var(--pine);}
+  .toggle button.unsure[aria-pressed="true"]{background:var(--amber);}
+  .toggle button.no[aria-pressed="true"]{background:var(--rust);}
+  .toggle button:focus-visible{outline:2px solid var(--pine); outline-offset:-2px;}
+
+  .verdict{
+    position:sticky;
+    bottom:1rem;
+    margin-top:2.2rem;
+    background:var(--paper-raised);
+    border:1px solid var(--rule-strong);
+    border-radius:6px;
+    padding:1.1rem 1.3rem;
+    box-shadow:0 6px 20px var(--shadow);
+  }
+  .verdict-top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+  .verdict-name{
+    font-family:"Fraunces", Georgia, serif;
+    font-weight:600;
+    font-size:1.05rem;
+  }
+  .verdict-score{
+    font-family:"IBM Plex Mono", monospace;
+    font-variant-numeric:tabular-nums;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+  }
+  .verdict-bar{
+    height:8px;
+    border-radius:4px;
+    background:var(--rule);
+    margin:0.7rem 0 0.6rem;
+    overflow:hidden;
+  }
+  .verdict-bar-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--rust), var(--amber) 50%, var(--pine));
+    width:0%;
+    transition:width 0.35s ease;
+  }
+  .verdict-label{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.8rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .verdict-note{
+    font-size:0.86rem;
+    color:var(--ink-soft);
+    margin-top:0.4rem;
+  }
+  .reset-row{
+    margin-top:2.4rem;
+    text-align:right;
+  }
+  .reset-row button{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.72rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    background:none;
+    border:1px solid var(--rule-strong);
+    color:var(--ink-soft);
+    padding:0.45rem 0.8rem;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .reset-row button:hover{color:var(--rust); border-color:var(--rust);}
+
+  footer{
+    margin-top:2.6rem;
+    padding-top:1rem;
+    border-top:1px solid var(--rule);
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width:520px){
+    .masthead-title{font-size:1.5rem;}
+    .entry{grid-template-columns:2rem 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="masthead-title">The Ledger of Ten</div>
+    <div class="masthead-date">A worksheet, not an oracle</div>
+  </header>
+
+  <p class="dek">Ten questions worth asking before a single share changes hands &mdash; distilled from five books that mostly agree you shouldn't be doing this, and one that explains what happens if you do it anyway. <strong>Answer honestly. The index is always the default.</strong></p>
+
+  <div class="sources">
+    <b>Sources.</b> <i>The Simple Path to Wealth</i> (J.L. Collins) &middot; <i>The Coffeehouse Investor</i> (Bill Schultheis) &middot; <i>The Little Book of Common Sense Investing</i> (John C. Bogle) &middot; <i>A Random Walk Down Wall Street</i> (Burton Malkiel) &middot; <i>Reminiscences of a Stock Operator</i> (Edwin Lefèvre).
+  </div>
+
+  <div class="company-field">
+    <label for="company">Company under review</label>
+    <input type="text" id="company" placeholder="e.g. Acme Corp (ACME)" autocomplete="off">
+  </div>
+
+  <ol class="ledger" id="ledger">
+    <!-- entries injected by JS -->
+  </ol>
+
+  <div class="reset-row"><button id="resetBtn" type="button">Clear this ledger</button></div>
+
+  <footer>
+    This worksheet organizes ideas from the five books above; it is not financial advice, and none of these authors would want it treated as a signal to trade on. Your answers are saved only in this browser.
+  </footer>
+</div>
+
+<div class="verdict" id="verdict">
+  <div class="verdict-top">
+    <div class="verdict-name" id="verdictName">No company entered yet</div>
+    <div class="verdict-score" id="verdictScore">0 / 10</div>
+  </div>
+  <div class="verdict-bar"><div class="verdict-bar-fill" id="verdictFill"></div></div>
+  <div class="verdict-label" id="verdictLabel">&mdash;</div>
+  <div class="verdict-note" id="verdictNote">Work through the ledger below. Nothing here is scored until you answer.</div>
+</div>
+
+<script>
+const PRINCIPLES = [
+  {
+    q: "Would an index fund already do this for you?",
+    p: "Owning the whole market is the default position, not the fallback. A single stock has to earn its way out of the index, not the other way around.",
+    cite: "<b>Bogle</b> &amp; <b>Collins</b> &mdash; own the haystack, don't hunt for the needle."
+  },
+  {
+    q: "Do you understand how it actually makes money?",
+    p: "Not the story, the mechanism: who pays it, for what, and why they'll keep paying. If you can't explain the business in two plain sentences, you don't own it &mdash; it owns you.",
+    cite: "<b>Malkiel</b> &mdash; a firm foundation of real earnings, not a castle in the air."
+  },
+  {
+    q: "Is the price reasonable next to what the business earns?",
+    p: "Bubbles form when price detaches from earnings and rides on the hope that someone else will pay more tomorrow. Check that you're not the last one holding that hope.",
+    cite: "<b>Malkiel</b> &mdash; the castle-in-the-air theory of speculative pricing."
+  },
+  {
+    q: "Will costs and taxes quietly eat the edge?",
+    p: "Trading fees, fund expenses, and short-term capital gains compound against you as reliably as returns compound for you. A thesis has to beat its own friction, not just the market.",
+    cite: "<b>Bogle</b> &mdash; the relentless rules of humble arithmetic."
+  },
+  {
+    q: "Does the trend actually agree with your thesis?",
+    p: "A great story fighting a falling tape is usually just a falling tape. Trade with the line of least resistance, not against it out of stubbornness.",
+    cite: "<b>Lefèvre / Livermore</b> &mdash; never argue with the tape."
+  },
+  {
+    q: "Do you know, in advance, what would prove you wrong?",
+    p: "Decide your exit before you decide your entry. The trader who loses fortunes isn't the one who's wrong &mdash; it's the one who's wrong and stays wrong.",
+    cite: "<b>Lefèvre / Livermore</b> &mdash; cut losses quickly; let the rare winner run."
+  },
+  {
+    q: "Is this your judgment, or someone else's tip?",
+    p: "A hot tip outsources the one thing that was supposed to be yours: the reasoning. If you can't defend the position without citing who told you, you don't have a position.",
+    cite: "<b>Lefèvre / Livermore</b> &mdash; beware the insider, the tipster, and your own hope."
+  },
+  {
+    q: "Could you hold this for twenty years, not twenty days?",
+    p: "Money left alone in good businesses compounds quietly for decades; money moved around chasing this quarter's story mostly just pays commissions.",
+    cite: "<b>Collins</b> &amp; <b>Schultheis</b> &mdash; time in the market, not timing it."
+  },
+  {
+    q: "How much of the portfolio would this actually be?",
+    p: "A single stock is a bet, not a plan. Keep it small enough that being wrong is a lesson, not a catastrophe &mdash; the rest stays diversified and boring on purpose.",
+    cite: "<b>Schultheis</b> &mdash; don't put all your eggs in one basket."
+  },
+  {
+    q: "Could you watch it fall 50% without selling at the bottom?",
+    p: "Every book on this shelf agrees on one thing: the money isn't lost to bad picks nearly as often as it's lost to panic. If a 50% drop would break your nerve, it's already too big a position.",
+    cite: "<b>All five</b> &mdash; the market's real test is temperament, not intellect."
+  }
+];
+
+const STATES = ["yes", "unsure", "no"];
+const LABELS = {yes: "Yes", unsure: "Unsure", no: "No"};
+
+function storageKey(company){
+  return "ledger-of-ten:" + (company || "__default__");
+}
+
+function loadAnswers(company){
+  try{
+    const raw = localStorage.getItem(storageKey(company));
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+
+function saveAnswers(company, answers){
+  try{ localStorage.setItem(storageKey(company), JSON.stringify(answers)); }catch(e){}
+}
+
+const ledgerEl = document.getElementById("ledger");
+const companyInput = document.getElementById("company");
+let currentCompany = "";
+let answers = {};
+
+function render(){
+  ledgerEl.innerHTML = "";
+  PRINCIPLES.forEach((item, i) => {
+    const li = document.createElement("li");
+    li.className = "entry";
+
+    const num = document.createElement("div");
+    num.className = "entry-num";
+
+    const body = document.createElement("div");
+    body.className = "entry-body";
+
+    const h3 = document.createElement("h3");
+    h3.textContent = item.q;
+
+    const p = document.createElement("p");
+    p.textContent = item.p;
+
+    const cite = document.createElement("div");
+    cite.className = "cite";
+    cite.innerHTML = item.cite;
+
+    const toggle = document.createElement("div");
+    toggle.className = "toggle";
+    toggle.setAttribute("role", "group");
+    toggle.setAttribute("aria-label", item.q);
+
+    STATES.forEach(state => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = state;
+      btn.textContent = LABELS[state];
+      btn.setAttribute("aria-pressed", answers[i] === state ? "true" : "false");
+      btn.addEventListener("click", () => {
+        answers[i] = (answers[i] === state) ? undefined : state;
+        saveAnswers(currentCompany, answers);
+        render();
+      });
+      toggle.appendChild(btn);
+    });
+
+    body.appendChild(h3);
+    body.appendChild(p);
+    body.appendChild(cite);
+    body.appendChild(toggle);
+    li.appendChild(num);
+    li.appendChild(body);
+    ledgerEl.appendChild(li);
+  });
+
+  updateVerdict();
+}
+
+function updateVerdict(){
+  const weights = {yes: 1, unsure: 0.5, no: 0};
+  let answered = 0;
+  let score = 0;
+  PRINCIPLES.forEach((_, i) => {
+    const a = answers[i];
+    if(a){
+      answered += 1;
+      score += weights[a];
+    }
+  });
+
+  const name = currentCompany.trim() || "No company entered yet";
+  document.getElementById("verdictName").textContent = name;
+  document.getElementById("verdictScore").textContent = score.toFixed(1) + " / 10";
+
+  const pct = Math.round((score / 10) * 100);
+  document.getElementById("verdictFill").style.width = pct + "%";
+
+  const labelEl = document.getElementById("verdictLabel");
+  const noteEl = document.getElementById("verdictNote");
+
+  if(answered === 0){
+    labelEl.textContent = "—";
+    labelEl.style.color = "var(--ink-soft)";
+    noteEl.textContent = "Work through the ledger below. Nothing here is scored until you answer.";
+    return;
+  }
+
+  if(answered < PRINCIPLES.length){
+    labelEl.textContent = "In progress · " + answered + " of 10 answered";
+    labelEl.style.color = "var(--ink-soft)";
+    noteEl.textContent = "Keep going — a partial ledger doesn't give a fair verdict.";
+    return;
+  }
+
+  if(score >= 8){
+    labelEl.textContent = "Worth the exception";
+    labelEl.style.color = "var(--pine)";
+    noteEl.textContent = "This clears a genuinely high bar. Still size it like the exception it is.";
+  } else if(score >= 5.5){
+    labelEl.textContent = "Weak case — read it again";
+    labelEl.style.color = "var(--amber)";
+    noteEl.textContent = "More doubts than convictions. Revisit the “no” and “unsure” answers before committing money.";
+  } else {
+    labelEl.textContent = "Buy the index instead";
+    labelEl.style.color = "var(--rust);";
+    noteEl.textContent = "By this ledger's own logic, the low-cost index fund is still the better bet.";
+    labelEl.style.color = "var(--rust)";
+  }
+}
+
+companyInput.addEventListener("input", () => {
+  currentCompany = companyInput.value;
+  answers = loadAnswers(currentCompany);
+  try{ localStorage.setItem("ledger-of-ten:last-company", currentCompany); }catch(e){}
+  render();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  answers = {};
+  saveAnswers(currentCompany, answers);
+  render();
+});
+
+(function init(){
+  try{
+    const last = localStorage.getItem("ledger-of-ten:last-company");
+    if(last){
+      currentCompany = last;
+      companyInput.value = last;
+    }
+  }catch(e){}
+  answers = loadAnswers(currentCompany);
+  render();
+})();
+</script>
+</body>
+</html>
