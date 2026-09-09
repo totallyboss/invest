@@ -1,8 +1,7 @@
 # The Ledger of Ten
 
-Type in a company or fund. It researches the stock's recent price history
-and recent news, then scores the case against ten principles distilled
-from five investing books:
+A single-page worksheet for deciding whether an individual stock is worth
+buying. It distills ten questions from five investing books:
 
 - *The Simple Path to Wealth* — J.L. Collins
 - *The Coffeehouse Investor* — Bill Schultheis
@@ -11,50 +10,22 @@ from five investing books:
 - *Reminiscences of a Stock Operator* — Edwin Lefèvre
 
 Four of these books argue that indexing beats picking stocks; the fifth
-tells you what happens when you pick stocks anyway. The ledger keeps that
-tension: the index is the default, and a stock has to clear a real bar to
-earn a place outside it.
+tells you what happens when you pick stocks anyway. The worksheet keeps
+that tension: the index is the default, and a stock has to clear a real
+bar to earn a place outside it.
 
-## How it works
+## Use it
 
-This is a Next.js app. The `/api/analyze` route sends your query to Claude
-(`claude-opus-5`) with web search enabled, instructed to research the
-company against the ten principles and return a structured verdict. The
-page renders that verdict as a scored ledger, same as the original
-worksheet — but the answers now come from live research instead of your
-own judgment on the personal questions (which the app still leaves to you:
-position size, exit plan, whether it's your own conviction or a tip).
+Open `index.html` in a browser. No build step, no server, no dependencies.
 
-## Run it locally
+Type a company name, answer each of the ten questions (Yes / Unsure / No),
+and the ledger scores the case out of 10 and gives a verdict:
 
-```bash
-npm install
-cp .env.example .env.local   # then paste in your Anthropic API key
-npm run dev
-```
+- **8–10** — worth the exception, sized like one
+- **5.5–7.9** — weak case, re-read your doubts
+- **below 5.5** — buy the index instead
 
-Open http://localhost:3000. Get an API key at
-[console.anthropic.com](https://console.anthropic.com/).
+Answers are saved per company in the browser's local storage, so you can
+revisit or compare tickers later. Nothing is sent anywhere.
 
-## Deploy to Vercel
-
-Push this repo to GitHub, import it in Vercel, and add `ANTHROPIC_API_KEY`
-as an environment variable in the project settings. No other config is
-needed — the API route is already set to `maxDuration = 60` to give
-research time to finish.
-
-## The original worksheet
-
-The manual, no-network version — fill in your own Yes/Unsure/No per
-question — still lives at `public/manual/index.html`. Open it directly in
-a browser; it needs nothing else.
-
-## Notes
-
-- Answers on the "evidence" principles (understanding the business, price
-  vs. earnings, trend, long-term durability) are scored automatically from
-  what Claude finds. The "personal" principles (position size, exit plan,
-  tips vs. judgment, temperament) are never scored — the app explains what
-  to weigh and leaves the call to you.
-- This is a research tool, not financial advice, and it can be wrong —
-  verify anything material before acting on it.
+This is a worksheet, not financial advice.
